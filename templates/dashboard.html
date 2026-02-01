@@ -1,0 +1,119 @@
+{% extends 'nav.html' %}
+
+{% block content %}
+
+<!-- Shorten URL Card -->
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+
+          <h3 class="text-center mb-4">🔗 Shorten a URL</h3>
+
+          <!-- Messages -->
+          {% if messages %}
+            {% for msg in messages %}
+              <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ msg }}
+                <button type="button" class="close" data-dismiss="alert">
+                  <span>&times;</span>
+                </button>
+              </div>
+            {% endfor %}
+          {% endif %}
+
+          <!-- Form -->
+          <form action="{% url 'generate' %}" method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+              <label>Original URL</label>
+              <input
+                type="url"
+                name="original"
+                class="form-control"
+                placeholder="https://example.com"
+                required>
+            </div>
+
+            <div class="form-group">
+              <label>Custom Short URL (optional)</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">http://localhost:8000/</span>
+                </div>
+                <input
+                  type="text"
+                  name="short"
+                  class="form-control"
+                  placeholder="6 characters"
+                  maxlength="6">
+              </div>
+              <small class="form-text text-muted">
+                Leave blank to generate automatically.
+              </small>
+            </div>
+
+            <div class="text-center mt-4">
+              <button type="submit" class="btn btn-primary px-5">
+                Generate
+              </button>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- URL List -->
+<div class="container mt-5">
+  <h4 class="text-center mb-4">📋 Your URLs</h4>
+
+  {% if urls %}
+    <div class="row">
+      {% for u in urls %}
+        <div class="col-md-6 mb-3">
+          <div class="card shadow-sm h-100">
+            <div class="card-body">
+
+              <p class="mb-1">
+                <strong>Original:</strong><br>
+                <a href="{{ u.original_url }}" target="_blank">
+                  {{ u.original_url }}
+                </a>
+              </p>
+
+              <p class="mb-1">
+                <strong>Short:</strong><br>
+                <a href="http://localhost:8000/{{ u.short_query }}" target="_blank">
+                  http://localhost:8000/{{ u.short_query }}
+                </a>
+              </p>
+
+              <p class="text-muted mb-0">
+                Visits: {{ u.visits }}
+              </p>
+
+              <p class="text-muted mb-0">
+                Created At: {{ u.created_at }}
+              </p>
+              <a href="{% url 'edit' u.id %}" class="btn btn-sm btn-warning">Edit</a>
+            <a href="{% url 'delete' u.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this URL?')">Delete</a>
+
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-center text-muted">No URLs created yet.</p>
+  {% endif %}
+</div>
+
+{% endblock %}
